@@ -1,0 +1,56 @@
+funções de agragação
+ -> count,sum,max,min,avg
+ 
+ ->encontre o sálario mínimo, máximo e a média de sálario entre todos os empregados
+ q15: select max(salario),min(salario),avg(salario) from empregado
+ 
+ -> algumas implementações da SQL podem não permitir mais de uma função na cláusula
+ SELECT
+ 
+ -> encontre o sálario máximo, mínimo e a média de sálario entre os empregados que
+ trabalham para o departamento 'Pesquisa'
+ 
+ q16:select max(salario),min(salario),avg(salario) from empregado,departamento where
+ dno=dnumero and dnome='Pesquisa'
+ 
+ Consulta 17 e 18: Recupere o número total de empregados da empresa (Q17), e o
+ número de empregados do departamento ‘Pesquisa' (Q18).
+ 
+ Q17: SELECT COUNT (*) FROM EMPREGADO
+ 
+ Q18: SELECT COUNT (*) FROM EMPREGADO, DEPARTAMENTO WHERE DNO=DNUMERO 
+ AND DNOME=‘Pesquisa’
+ 
+ 
+ A SQL tem uma cláusula GROUP BY para especificar os atributos de agrupamento,
+ que devem aparecer também na cláusula SELECT
+ 
+ Consulta 21: Para cada projeto, recupere o número do projeto, o nome 
+ e o número de empregados que trabalham nesse projeto.
+ 
+ Q21: SELECT PNUMERO, PNOME, COUNT (*) FROM PROJETO, TRABALHA_EM WHERE 
+ PNUMERO=PNO GROUP BY PNUMERO, PNOME
+ 
+ Consulta 25: Recupere todos os empregados cujo endereço é Houston, Texas. Aqui, 
+ o valor do atributo ENDERECO deve conter a substring 'Houston,TX'.
+ 
+ Q25: SELECT PNOME, UNOME FROM EMPREGADO WHERE
+ENDERECO LIKE '%Houston,TX%'
+ 
+ 
+ Consulta 26: Recupere todos os empregados que nasceram durante a década de 1950s.
+ Aqui, '5' deve ser o 8o caractere da string (de acordo com o formato da data),
+ assim o valor de DATANASC deve ser '_______5_', com cada sublinhado como um lugar 
+ para um caractere.
+ 
+ Q26: SELECT PNOME, UNOME FROM EMPREGADO WHERE DATANASC LIKE '_______5_’
+ 
+ A operação LIKE permite quebrar a impressão de que cada valor é atômico e 
+ indivisível
+  Consequentemente, em SQL, atributos string não são atômicos
+  
+  Consulta 27: Mostra o efeito de dar um aumento de 10% a todos os empregados 
+  que trabalham no projeto 'ProductX'.
+  
+  Q27: SELECT PNOME, UNOME, 1.1*SALARIO FROM EMPREGADO, TRABALHA_EM, 
+  PROJECT WHERE SSN=ESSN AND PNO=PNUMERO AND PNOME='ProductX’
