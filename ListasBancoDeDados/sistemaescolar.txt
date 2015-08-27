@@ -1,0 +1,581 @@
+CREATE TABLE Departamento(
+	codigo char(3) NOT NULL PRIMARY KEY,
+	nome char(30) NOT NULL
+);
+
+CREATE TABLE Professor(
+	cpf char(11) NOT NULL PRIMARY KEY,
+	nome char(30) NOT NULL,
+	dataNascimento Date NOT NULL,
+	logradouro char(30) NOT NULL,
+	bairro char(20) NOT NULL,
+	cidade char(20) NOT NULL,
+	estado char(2) NOT NULL,
+	cep integer NOT NULL,
+	codigoDepartamento char(3) NOT NULL,
+	FOREIGN KEY (codigoDepartamento) REFERENCES Departamento(codigo)
+);
+
+CREATE TABLE Curso(
+	codigo char(3) NOT NULL PRIMARY KEY,
+	nome char(30) NOT NULL,
+	codigoDepartamento char(3) NOT NULL,
+	FOREIGN KEY (codigoDepartamento) REFERENCES Departamento(codigo)
+);
+
+CREATE TABLE Disciplina(
+	codigoCurso char(3) NOT NULL,
+	codigo integer NOT NULL UNIQUE,
+	nome char(30) NOT NULL,
+	creditos integer NOT NULL,
+	aulasTeoricas integer NOT NULL,
+	aulasPraticas integer NOT NULL,
+	PRIMARY KEY (codigoCurso,codigo),
+	FOREIGN KEY (codigoCurso) REFERENCES Curso(codigo)
+);
+
+CREATE TABLE Vinculo(
+	cpfProfessor char(11) NOT NULL,
+	codigoCurso char(3) NOT NULL,
+	codigoDisciplina integer NOT NULL,
+	PRIMARY KEY (cpfProfessor,codigoCurso,codigoDisciplina),
+	FOREIGN KEY (cpfProfessor) REFERENCES Professor(cpf),
+	FOREIGN KEY (codigoCurso, codigoDisciplina) REFERENCES Disciplina(codigoCurso, codigo)
+);
+
+CREATE TABLE DiaDaSemana(
+	codigo integer NOT NULL PRIMARY KEY,
+	nome char(15) NOT NULL
+);
+
+CREATE TABLE Semestre(
+	ano integer NOT NULL,
+	numero integer NOT NULL,
+	dataInicioDasAulas Date NOT NULL,
+	dataTerminoDasAulas Date NOT NULL,
+	PRIMARY KEY (ano,numero)
+);
+
+CREATE TABLE Turma(
+	codigoCurso char(3) NOT NULL,
+	codigoDisciplina integer NOT NULL,
+	numero char(3) NOT NULL,
+	numeroSubTurma char(1) NOT NULL,
+	anoSemestre integer NOT NULL,
+	numeroSemestre integer NOT NULL,
+	PRIMARY KEY (codigoCurso,codigoDisciplina,numero,numeroSubTurma,anoSemestre,numeroSemestre),
+	FOREIGN KEY (codigoCurso,codigoDisciplina) REFERENCES Disciplina(codigoCurso, codigo),
+	FOREIGN KEY (anoSemestre,numeroSemestre) REFERENCES Semestre(ano,numero)
+);
+
+CREATE TABLE DiasDeAula(
+	codigoCurso char(3) NOT NULL,
+	codigoDisciplina integer NOT NULL,
+	numeroTurma char(3) NOT NULL,
+	numeroSubTurma char(1) NOT NULL,
+	anoSemestre integer NOT NULL,
+	numeroSemestre integer NOT NULL,
+	codigoDiaSemana integer,
+	tipoAula char(1) NOT NULL,
+	horario char(2) NOT NULL,
+	PRIMARY KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,codigoDiaSemana),
+	FOREIGN KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre) REFERENCES Turma(codigoCurso,codigoDisciplina,numero,numeroSubTurma,anoSemestre,numeroSemestre),
+	FOREIGN KEY (codigoDiaSemana) REFERENCES DiaDaSemana(codigo)
+);
+
+CREATE TABLE Aula(
+	codigoCurso char(3) NOT NULL,
+	codigoDisciplina integer NOT NULL,
+	numeroTurma char(3) NOT NULL,
+	numeroSubTurma char(1) NOT NULL,
+	anoSemestre integer NOT NULL,
+	numeroSemestre integer NOT NULL,
+	data Date NOT NULL,
+	numero integer NOT NULL,
+	resumo char(60) NOT NULL,
+	cpfProfessor char(11) NOT NULL,
+	PRIMARY KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,data,numero),
+	FOREIGN KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre) REFERENCES Turma(codigoCurso,codigoDisciplina,numero,numeroSubTurma,anoSemestre,numeroSemestre),
+	FOREIGN KEY (cpfProfessor) REFERENCES Professor(cpf)
+);
+
+CREATE TABLE Genero(
+	sigla char(1) NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE Aluno(
+	matricula integer NOT NULL PRIMARY KEY,
+	nome char(30) NOT NULL,
+	dataNascimento Date NOT NULL,
+	logradouro char(30) NOT NULL,
+	bairro char(20) NOT NULL,
+	estado char(2) NOT NULL,
+	cep integer NOT NULL,
+	genero char(1) NOT NULL,
+	FOREIGN KEY (genero) REFERENCES Genero(sigla)
+);
+
+CREATE TABLE Matricula(
+	codigoCurso char(3) NOT NULL,
+	codigoDisciplina integer NOT NULL,
+	numeroTurma char(3) NOT NULL,
+	numeroSubTurma char(1) NOT NULL,
+	anoSemestre integer NOT NULL,
+	numeroSemestre integer NOT NULL,
+	matriculaAluno integer NOT NULL,
+	dataMatricula Date NOT NULL,
+	notaFinal numeric(3,1) NOT NULL,
+	PRIMARY KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,matriculaAluno,dataMatricula),
+	FOREIGN KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre) REFERENCES Turma(codigoCurso,codigoDisciplina,numero,numeroSubTurma,anoSemestre,numeroSemestre),
+	FOREIGN KEY (matriculaAluno) REFERENCES Aluno(matricula)
+);
+
+CREATE TABLE Frequencia(
+	codigoCurso char(3) NOT NULL,
+	codigoDisciplina integer NOT NULL,
+	numeroTurma char(3) NOT NULL,
+	numeroSubTurma char(1) NOT NULL,
+	anoSemestre integer NOT NULL,
+	numeroSemestre integer NOT NULL,
+	dataAula Date NOT NULL,
+	numeroAula integer NOT NULL,
+	matriculaAluno integer NOT NULL,
+	dataMatricula Date NOT NULL,
+	indPresenca char(1) NOT NULL,
+	PRIMARY KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,dataAula,numeroAula,matriculaAluno,dataMatricula),
+	FOREIGN KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,dataAula,numeroAula) REFERENCES Aula(codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,data,numero),
+	FOREIGN KEY (codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,matriculaAluno,dataMatricula) REFERENCES Matricula(codigoCurso,codigoDisciplina,numeroTurma,numeroSubTurma,anoSemestre,numeroSemestre,matriculaAluno,dataMatricula)
+);
+
+
+INSERT INTO Departamento VALUES
+	('CMP','CIÊNCIA DA COMPUTAÇÃO'),
+	('FIT','FILOSOFIA E TEOLOGIA'),
+	('ADM','ADMINISTRAÇÃO'),
+	('ENG','ENGENHARIA'),
+	('ECO','ECONOMIA'),
+	('BIO','BIOLOGIA'),
+	('ZOO','ZOOTECNICA'),
+	('MAF','MATEMÁTICA E FÍSICA'),
+	('FAR','FARMÁCIA');
+	
+	
+INSERT INTO Professor VALUES 
+	('11111111111','Ivon Canedo',DATE '1947-05-04','Rua 1','S Bueno','Goiânia','GO',74000001,'CMP'),
+	('22222222222','Marcio Kanutto',DATE '1950-10-30','Rua 2','S Sul','Goiânia','GO',74000002,'CMP'),
+	('33333333333','Flávio dos Reis',DATE '1943-03-10','Rua 2','Ipanema','Rio de Janeiro','RJ',60000003,'FIT'),
+	('44444444444','Maria Ribeiro',DATE '1960-06-30','Rua 3','Pavuna','São Paulo','SP',50000004,'ADM'),
+	('55555555555','Carla Lemos',DATE '1952-07-30','Rua 4','S Oeste','Goiânia','GO',74000005,'ADM'),
+	('66666666666','Marcos Cintra',DATE '1951-04-20','Rua 5','S Central','Goiânia','GO',75000006,'ENG'),
+	('77777777777','Francisco Chagas',DATE '1955-10-12','Rua 6','Vila Nova','B Horizonte','MG',45000007,'ENG'),
+	('88888888888','Virgílio',DATE '1956-03-14','Rua 7','S Universitário','Salvador','BA',35000008,'BIO'),
+	('99999999999','Francisco Reis',DATE '1958-10-20','Rua 8','Marista','Goiânia','GO',36000009,'FIT');
+
+	
+INSERT INTO Curso VALUES
+	('CMP','CIÊNCIA DA COMPUTAÇÃO','CMP'),
+	('ENC','ENGENHARIA DE COMPUTAÇÃO','CMP'),
+	('FIL','FILOSOFIA E TEOLOGIA','FIT'),
+	('TEO','TEOLOGIA','FIT'),
+	('ADM','ADMINISTRAÇÃO','ADM'),
+	('ENG','ENGENHARIA CIVIL','ENG'),
+	('ECO','ECONOMIA','ECO'),
+	('BIO','BIOLOGIA','BIO'),
+	('ZOO','ZOOTECNICA','BIO'),
+	('MAT','MATEMÁTICA','MAF'),
+	('FIS','FISICA','MAF');
+	
+INSERT INTO Disciplina VALUES
+	('CMP',4070,'ENGENHARIA DE SOFTWARE',6,4,2),
+	('CMP',4433,'BANCO DE DADOS I',4,2,2),
+	('CMP',4033,'PROJETO DE SISTEMA',6,6,0),
+	('CMP',3243,'ANÁLISE',4,4,0),
+	('ADM',1000,'INTRODUÇÃO A ADMINISTRAÇÃO',4,4,0),
+	('FIL',3444,'INTRODUÇÃO A FILOSOFIA',4,4,0),
+	('CMP',3030,'BANCO DE DADOS II',6,4,2),
+	('MAT',1010,'CÁLCULO I',4,4,0),
+	('FIS',1020,'FISICA I',6,4,0),
+	('ADM',4040,'ADMINISTRAÇÃO PÚBLICA',4,4,0),
+	('MAT',8080,'ALGEBRA LINEAR',6,6,0),
+	('FIS',2020,'FISICA II',6,4,2),
+	('FIL',9090,'FILOFIA II',4,4,0);
+	
+INSERT INTO Vinculo VALUES
+	('11111111111','CMP',4070),
+	('22222222222','CMP',4433),
+	('22222222222','CMP',4033),
+	('11111111111','CMP',3030),
+	('33333333333','CMP',3243),
+	('44444444444','ADM',1000),
+	('33333333333','CMP',3030),
+	('55555555555','ADM',4040),
+	('66666666666','FIL',3444),
+	('77777777777','FIS',1020),
+	('77777777777','FIS',2020),
+	('88888888888','MAT',8080),
+	('88888888888','MAT',1010);
+
+	
+INSERT INTO DiaDaSemana VALUES
+	(1,'DOMINGO'),
+	(2,'SEGUNDA-FEIRA'),
+	(3,'TERÇA-FEIRA'),
+	(4,'QUARTA-FEIRA'),
+	(5,'QUINTA-FEIRA'),
+	(6,'SEXTA-FEIRA'),
+	(7,'SÁBADO');
+	
+	
+INSERT INTO Semestre VALUES
+	(2012,2,DATE '2012-03-06',DATE '2012-12-18');
+
+	
+INSERT INTO Turma VALUES
+	('CMP',4070,'A01',0,2012,2),
+	('CMP',4070,'A01',1,2012,2),
+	('CMP',4070,'A01',2,2012,2),
+	('CMP',4070,'A02',1,2012,2),
+	('CMP',4070,'C01',0,2012,2),
+	('CMP',4070,'C01',1,2012,2),
+	('CMP',4070,'C01',2,2012,2),
+	('CMP',4433,'A01',0,2012,2),
+	('CMP',4433,'A01',1,2012,2),
+	('CMP',4433,'A01',2,2012,2),
+	('CMP',4433,'C01',0,2012,2),
+	('CMP',4433,'C01',1,2012,2),
+	('CMP',4433,'C01',2,2012,2),
+	('CMP',4433,'A02',0,2012,2),
+	('CMP',4433,'A02',1,2012,2),
+	('CMP',4433,'A02',2,2012,2),
+	('CMP',4033,'A01',0,2012,2),
+	('CMP',4033,'C01',0,2012,2),
+	('ADM',1000,'A01',0,2012,2),
+	('ADM',1000,'C01',0,2012,2),
+	('FIL',3444,'A01',0,2012,2),
+	('MAT',1010,'A01',0,2012,2),
+	('MAT',1010,'C01',0,2012,2),
+	('FIS',2020,'A01',0,2012,2),
+	('FIS',2020,'A01',1,2012,2),
+	('FIS',2020,'A01',2,2012,2),
+	('FIS',2020,'C01',0,2012,2),
+	('FIS',2020,'C01',1,2012,2),
+	('FIS',2020,'C01',2,2012,2),
+	('CMP',3243,'A01',0,2012,2),
+	('CMP',3243,'C01',0,2012,2),
+	('CMP',3243,'A02',0,2012,2),
+	('CMP',3030,'A01',0,2012,2),
+	('CMP',3030,'A01',1,2012,2),
+	('CMP',3030,'A02',2,2012,2),
+	('CMP',3030,'C01',0,2012,2),
+	('CMP',3030,'C01',2,2012,2),
+	('CMP',3030,'A01',2,2012,2);
+	
+
+INSERT INTO DiasDeAula VALUES
+	('CMP',4070,'A01',0,2012,2,4,'T','1M'),
+	('CMP',4070,'A01',0,2012,2,7,'T','1M'),
+	('CMP',4070,'A01',1,2012,2,4,'P','2M'),
+	('CMP',4070,'A01',2,2012,2,7,'P','3M'),
+	('CMP',4070,'C01',0,2012,2,4,'T','1N'),
+	('CMP',4070,'C01',0,2012,2,6,'T','1N'),
+	('CMP',4070,'C01',1,2012,2,4,'P','2N'),
+	('CMP',4070,'C01',2,2012,2,6,'P','3N'),
+	('CMP',4433,'A01',0,2012,2,2,'T','1M'),
+	('CMP',4433,'A01',1,2012,2,5,'P','1M'),
+	('CMP',4433,'A01',2,2012,2,5,'P','2M'),
+	('CMP',4433,'C01',0,2012,2,3,'T','2N'),
+	('CMP',4433,'C01',1,2012,2,6,'P','2N'),
+	('CMP',4433,'C01',2,2012,2,6,'P','3N'),
+	('CMP',4433,'A02',0,2012,2,4,'T','1M'),
+	('CMP',4433,'A02',1,2012,2,7,'P','1M'),
+	('CMP',4433,'A02',2,2012,2,7,'P','2M'),
+	('CMP',3030,'A01',0,2012,2,2,'T','2M'),
+	('CMP',3030,'A01',0,2012,2,5,'T','1M'),
+	('CMP',3030,'A01',1,2012,2,5,'P','2M'),
+	('CMP',3030,'A01',2,2012,2,5,'P','3M'),
+	('ADM',1000,'A01',0,2012,2,4,'T','1M'),
+	('ADM',1000,'A01',0,2012,2,7,'T','1M'),
+	('ADM',1000,'C01',0,2012,2,4,'T','2N'),
+	('ADM',1000,'C01',0,2012,2,7,'T','2N'),
+	('FIL',3444,'A01',0,2012,2,2,'T','1M'),
+	('FIL',3444,'A01',0,2012,2,4,'T','1M'),
+	('FIS',2020,'A01',0,2012,2,5,'T','1M'),
+	('FIS',2020,'A01',0,2012,2,7,'T','1M'),
+	('FIS',2020,'A01',1,2012,2,7,'P','2M'),
+	('FIS',2020,'A01',2,2012,2,7,'P','3M'),
+	('FIS',2020,'C01',0,2012,2,3,'T','1N'),
+	('FIS',2020,'C01',0,2012,2,6,'T','1N'),
+	('FIS',2020,'C01',1,2012,2,6,'P','2N'),
+	('FIS',2020,'C01',2,2012,2,6,'P','3N'),
+	('MAT',1010,'A01',0,2012,2,4,'T','3M'),
+	('MAT',1010,'A01',0,2012,2,7,'T','3M'),
+	('MAT',1010,'C01',0,2012,2,4,'T','3N'),
+	('MAT',1010,'C01',0,2012,2,7,'T','3N'),
+	('CMP',4033,'C01',0,2012,2,3,'T','3N'),
+	('CMP',4033,'C01',0,2012,2,4,'T','3N'),
+	('CMP',4033,'C01',0,2012,2,7,'T','3N');
+
+	
+INSERT INTO Aula VALUES
+	('CMP',4070,'A01',0,2012,2,DATE '2012-03-03',1,'Introdução','11111111111'),
+	('CMP',4070,'A01',0,2012,2,DATE '2012-03-06',1,'Introdução','11111111111'),
+	('CMP',4070,'A01',1,2012,2,DATE '2012-03-03',1,'Introdução','11111111111'),
+	('CMP',4070,'A01',2,2012,2,DATE '2012-03-06',2,'Revisão de conteúdo','11111111111'),
+	('CMP',4070,'C01',0,2012,2,DATE '2012-03-03',1,'Diagrama de Classes','11111111111'),
+	('CMP',4070,'C01',0,2012,2,DATE '2012-03-05',1,'Introdução','11111111111'),
+	('CMP',4070,'C01',1,2012,2,DATE '2012-03-03',2,'Desenvolvimento Ágil de Software','11111111111'),
+	('CMP',4070,'C01',2,2012,2,DATE '2012-03-05',2,'Diagrama de Classes','11111111111'),
+	('CMP',4433,'A01',0,2012,2,DATE '2012-03-01',1,'Revisão de conteúdo','22222222222'),
+	('CMP',4433,'A01',1,2012,2,DATE '2012-03-04',1,'Álgebra Relacional','22222222222'),
+	('CMP',4433,'A01',2,2012,2,DATE '2012-03-04',1,'Álgebra Relacional parte 2','22222222222'),
+	('CMP',4433,'C01',0,2012,2,DATE '2012-03-02',1,'Revisão de conteúdo','22222222222'),
+	('CMP',4433,'C01',1,2012,2,DATE '2012-03-05',1,'Álgebra Relacional','22222222222'),
+	('CMP',4433,'C01',2,2012,2,DATE '2012-03-05',2,'Revisão de conteúdo','22222222222'),
+	('CMP',4433,'A02',0,2012,2,DATE '2012-03-02',1,'Funções e Gatilhos','22222222222'),
+	('CMP',4433,'A02',1,2012,2,DATE '2012-03-06',1,'Introdução','22222222222'),
+	('CMP',4433,'A02',2,2012,2,DATE '2012-03-06',2,'SQL','22222222222'),
+	('CMP',4033,'C01',0,2012,2,DATE '2012-03-02',1,'Revisão de conteúdo','22222222222'),
+	('CMP',4033,'C01',0,2012,2,DATE '2012-03-03',1,'Introdução','22222222222'),
+	('CMP',4033,'C01',0,2012,2,DATE '2012-03-06',1,'Prova','22222222222'),
+	('CMP',3030,'A01',0,2012,2,DATE '2012-03-01',1,'Diagrama entidade-relacionamento','33333333333'),
+	('CMP',3030,'A01',0,2012,2,DATE '2012-03-04',1,'Funções e Gatilhos','33333333333'),
+	('CMP',3030,'A01',1,2012,2,DATE '2012-03-04',1,'Revisão de conteúdo','33333333333'),
+	('CMP',3030,'A01',2,2012,2,DATE '2012-03-04',1,'Diagrama entidade-relacionamento','33333333333'),
+	('ADM',1000,'A01',0,2012,2,DATE '2012-06-03',1,'Apresentação','44444444444'),
+	('ADM',1000,'A01',0,2012,2,DATE '2012-03-06',1,'Revisão de conteúdo','44444444444'),
+	('ADM',1000,'C01',0,2012,2,DATE '2012-06-03',1,'Trabalho','44444444444'),
+	('ADM',1000,'C01',0,2012,2,DATE '2012-03-06',1,'Prova','44444444444'),
+	('FIL',3444,'A01',0,2012,2,DATE '2012-03-01',1,'Introdução','66666666666'),
+	('FIL',3444,'A01',0,2012,2,DATE '2012-03-03',1,'Prova','66666666666'),
+	('FIS',2020,'A01',0,2012,2,DATE '2012-10-04',1,'RESUMO','77777777777'),
+	('FIS',2020,'A01',0,2012,2,DATE '2012-03-06',1,'Revisão de conteúdo','77777777777'),
+	('FIS',2020,'A01',1,2012,2,DATE '2012-03-06',2,'Revisão de conteúdo parte 2','77777777777'),
+	('FIS',2020,'A01',2,2012,2,DATE '2012-03-06',3,'Apresentação de trabalho','77777777777'),
+	('FIS',2020,'C01',0,2012,2,DATE '2012-03-02',1,'Introdução','77777777777'),
+	('FIS',2020,'C01',0,2012,2,DATE '2012-03-05',1,'Revisão de conteúdo','77777777777'),
+	('FIS',2020,'C01',1,2012,2,DATE '2012-03-05',2,'Prova','77777777777'),
+	('FIS',2020,'C01',2,2012,2,DATE '2012-03-05',3,'Prova','77777777777'),
+	('MAT',1010,'A01',0,2012,2,DATE '2012-03-03',1,'Introdução','88888888888'),
+	('MAT',1010,'A01',0,2012,2,DATE '2012-03-06',1,'Introdução','88888888888'),
+	('MAT',1010,'C01',0,2012,2,DATE '2012-03-03',2,'Integral','88888888888'),
+	('MAT',1010,'C01',0,2012,2,DATE '2012-03-06',2,'Prova','88888888888');
+
+	
+INSERT INTO Genero VALUES 
+	('M'),
+	('F');
+
+
+INSERT INTO Aluno VALUES
+	(1,'ADNALDO LEMES',DATE '1978-10-10','RUA 1','S BUENO','GO',74000000,'M'),
+	(2,'ADIRANA BELLINI',DATE '1979-03-03','RUA 2','S CENTRAL','GO',71230000,'F'),
+	(3,'ALEXANDRE BARRETO',DATE '1980-05-20','RUA 3','BILA NOVA','GO',78000000,'M'),
+	(4,'CARLOS VENAN IO',DATE '1980-10-12','RUA 4','S MARISTA','GO',65000000,'M'),
+	(5,'DANIEL PINTO',DATE '1977-03-03','RUA 5','P LUDOVICO','GO',54000000,'M'),
+	(6,'DANILLO LUGSTOSA',DATE '1978-10-10','RUA 6','S OESTE','GO',23000500,'M'),
+	(7,'DENNIA ASSIS',DATE '1979-03-03','RUA 7','S SUL','GO',73000000,'F'),
+	(8,'ELIZZIANE VIEIRA',DATE '1980-05-20','RUA 8','S COIMBRA','GO',74000000,'F'),
+	(9,'EMERSON SALGADO',DATE '1980-10-12','RUA 9','J AMERICA','GO',74000000,'M'),
+	(10,'FABIANO ROCHA',DATE '1977-03-03','RUA 10','CAMPINAS','GO',71230000,'M'),
+	(11,'FABRICIO PERICLES',DATE '1978-10-10','RUA 11','S BUENO','GO',78000000,'M'),
+	(12,'FERNANDA CURADO',DATE '1979-03-03','RUA 1','S CENTRAL','GO',65000000,'F'),
+	(13,'FERNANDA FRANÇA',DATE '1980-05-20','RUA 2','BILA NOVA','GO',54000000,'F'),
+	(14,'FERNANDA RIBEIRO',DATE '1980-10-12','RUA 3','S MARISTA','GO',23000500,'F'),
+	(15,'FERNANDO ANTONIO',DATE '1977-03-03','RUA 4','P LUDOVICO','GO',73000000,'M'),
+	(16,'GUSTAVO ALESSANDRO',DATE '1978-10-10','RUA 5','S OESTE','GO',74000000,'M'),
+	(17,'LEANDRO HENRIQUE',DATE '1979-03-03','RUA 6','S SUL','GO',74000000,'M'),
+	(18,'LEONARDO DIAS',DATE '1980-05-20','RUA 7','S COIMBRA','GO',71230000,'M'),
+	(19,'LORAYNE NOVAIS',DATE '1980-10-12','RUA 8','J AMERICA','GO',78000000,'F'),
+	(20,'LORENA CAETANO',DATE '1977-03-03','RUA 9','CAMPINAS','GO',65000000,'F'),
+	(21,'MARCELO NARVAES',DATE '1978-10-10','RUA 10','S BUENO','GO',54000000,'M'),
+	(22,'MARCUS BORGES',DATE '1979-03-03','RUA 11','S CENTRAL','GO',23000500,'M'),
+	(23,'PATRICIA DE PAULA',DATE '1980-05-20','RUA 1','BILA NOVA','GO',73000000,'F'),
+	(24,'PATRICIA SILVA',DATE '1980-10-12','RUA 2','S MARISTA','GO',74000000,'F'),
+	(25,'RENATA CARVALHO',DATE '1977-03-03','RUA 3','P LUDOVICO','GO',74000000,'F'),
+	(26,'RICARDO LOPES',DATE '1978-10-10','RUA 4','S OESTE','GO',71230000,'M'),
+	(27,'RODRIGO BORGES',DATE '1979-03-03','RUA 5','S SUL','GO',78000-000,'M'),
+	(28,'STEFANE CELIAC',DATE '1980-05-20','RUA 6','S COIMBRA','GO',65000000,'F'),
+	(29,'TACITO CLAUDIO',DATE '1980-10-12','RUA 7','J AMERICA','GO',54000000,'M'),
+	(30,'TATIANA PIRES',DATE '1977-03-03','RUA 8','CAMPINAS','GO',23000500,'F'),
+	(31,'WALKER DA SILVA',DATE '1980-02-15','RUA 9','DERGO','GO',73000000,'M');
+
+	
+INSERT INTO Matricula VALUES
+	('CMP',4070,'A01',0,2012,2,1,DATE '2012-05-03','7.0'),
+	('CMP',4070,'A01',0,2012,2,2,DATE '2012-05-06','8.3'),
+	('CMP',4070,'A01',1,2012,2,3,DATE '2012-05-03','3.0'),
+	('CMP',4070,'A01',2,2012,2,4,DATE '2012-05-06','5.5'),
+	('CMP',4070,'C01',0,2012,2,5,DATE '2012-05-03','4.0'),
+	('CMP',4070,'C01',0,2012,2,6,DATE '2012-05-05','9.7'),
+	('CMP',4070,'C01',1,2012,2,7,DATE '2012-05-03','7.0'),
+	('CMP',4070,'C01',2,2012,2,8,DATE '2012-05-05','7.0'),
+	('CMP',4433,'A01',0,2012,2,1,DATE '2012-05-01','7.3'),
+	('CMP',4433,'A01',1,2012,2,9,DATE '2012-05-04','7.0'),
+	('CMP',4433,'A01',2,2012,2,4,DATE '2012-05-04','9.6'),
+	('CMP',3030,'C01',0,2012,2,2,DATE '2012-05-02','9.0'),
+	('CMP',4433,'C01',0,2012,2,2,DATE '2012-05-02','9.0'),
+	('CMP',4433,'C01',1,2012,2,3,DATE '2012-05-05','6.4'),
+	('CMP',4433,'C01',2,2012,2,5,DATE '2012-05-05','10.0'),
+	('CMP',4433,'A02',0,2012,2,6,DATE '2012-05-02','10.0'),
+	('CMP',4433,'A02',1,2012,2,7,DATE '2012-05-06','6.1'),
+	('CMP',3030,'A02',2,2012,2,14,DATE '2012-05-06','10.0'),
+	('CMP',4433,'A02',2,2012,2,14,DATE '2012-05-06','10.0'),
+	('CMP',4033,'C01',0,2012,2,4,DATE '2012-05-02','7.9'),
+	('CMP',4033,'C01',0,2012,2,5,DATE '2012-05-03','7.0'),
+	('CMP',4033,'C01',0,2012,2,6,DATE '2012-05-06','7.5'),
+	('CMP',3030,'A01',0,2012,2,7,DATE '2012-05-01','7.0'),
+	('CMP',3030,'A01',0,2012,2,17,DATE '2012-05-04','3.3'),
+	('CMP',3030,'A01',1,2012,2,18,DATE '2012-05-04','8.0'),
+	('CMP',3030,'A01',2,2012,2,19,DATE '2012-05-04','8.4'),
+	('ADM',1000,'A01',0,2012,2,20,DATE '2012-05-03','7.2'),
+	('ADM',1000,'A01',0,2012,2,21,DATE '2012-05-06','8.0'),
+	('ADM',1000,'C01',0,2012,2,22,DATE '2012-05-03','3.0'),
+	('ADM',1000,'C01',0,2012,2,23,DATE '2012-05-06','6.3'),
+	('FIL',3444,'A01',0,2012,2,24,DATE '2012-05-01','8.0'),
+	('FIL',3444,'A01',0,2012,2,25,DATE '2012-05-03','8.0'),
+	('FIS',2020,'A01',0,2012,2,26,DATE '2012-05-04','7.5'),
+	('FIS',2020,'A01',0,2012,2,27,DATE '2012-05-06','7.0'),
+	('FIS',2020,'A01',1,2012,2,28,DATE '2012-05-06','6.7'),
+	('FIS',2020,'A01',2,2012,2,29,DATE '2012-05-06','6.0'),
+	('FIS',2020,'C01',0,2012,2,30,DATE '2012-05-02','5.0'),
+	('FIS',2020,'C01',0,2012,2,31,DATE '2012-05-05','5.8'),
+	('FIS',2020,'C01',1,2012,2,15,DATE '2012-05-05','4.0'),
+	('FIS',2020,'C01',2,2012,2,16,DATE '2012-05-05','4.0'),
+	('MAT',1010,'A01',0,2012,2,10,DATE '2012-05-03','4.9'),
+	('MAT',1010,'A01',0,2012,2,11,DATE '2012-05-06','7.0'),
+	('MAT',1010,'C01',0,2012,2,12,DATE '2012-05-03','2.3'),
+	('MAT',1010,'C01',0,2012,2,13,DATE '2012-05-06','6.2');
+	
+	
+INSERT INTO Frequencia VALUES
+	('CMP',4070,'A01',0,2012,2,DATE '2012-03-03',1,1,DATE '2012-05-03','S'),
+	('CMP',4070,'A01',0,2012,2,DATE '2012-03-06',1,2,DATE '2012-05-06','S'),
+	('CMP',4070,'A01',1,2012,2,DATE '2012-03-03',1,3,DATE '2012-05-03','S'),
+	('CMP',4070,'A01',2,2012,2,DATE '2012-03-06',2,4,DATE '2012-05-06','S'),
+	('CMP',4070,'C01',0,2012,2,DATE '2012-03-03',1,5,DATE '2012-05-03','S'),
+	('CMP',4070,'C01',0,2012,2,DATE '2012-03-05',1,6,DATE '2012-05-05','N'),
+	('CMP',4070,'C01',1,2012,2,DATE '2012-03-03',2,7,DATE '2012-05-03','S'),
+	('CMP',4070,'C01',2,2012,2,DATE '2012-03-05',2,8,DATE '2012-05-05','S'),
+	('CMP',4433,'A01',0,2012,2,DATE '2012-03-01',1,1,DATE '2012-05-01','S'),
+	('CMP',4433,'A01',1,2012,2,DATE '2012-03-04',1,9,DATE '2012-05-04','S'),
+	('CMP',4433,'A01',2,2012,2,DATE '2012-03-04',1,4,DATE '2012-05-04','S'),
+	('CMP',4433,'C01',0,2012,2,DATE '2012-03-02',1,2,DATE '2012-05-02','N'),
+	('CMP',4433,'C01',1,2012,2,DATE '2012-03-05',1,3,DATE '2012-05-05','S'),
+	('CMP',4433,'C01',2,2012,2,DATE '2012-03-05',2,5,DATE '2012-05-05','S'),
+	('CMP',4433,'A02',0,2012,2,DATE '2012-03-02',1,6,DATE '2012-05-02','S'),
+	('CMP',4433,'A02',1,2012,2,DATE '2012-03-06',1,7,DATE '2012-05-06','S'),
+	('CMP',4433,'A02',2,2012,2,DATE '2012-03-06',2,14,DATE '2012-05-06','S'),
+	('CMP',4033,'C01',0,2012,2,DATE '2012-03-02',1,4,DATE '2012-05-02','S'),
+	('CMP',4033,'C01',0,2012,2,DATE '2012-03-03',1,5,DATE '2012-05-03','S'),
+	('CMP',4033,'C01',0,2012,2,DATE '2012-03-06',1,6,DATE '2012-05-06','N'),
+	('CMP',3030,'A01',0,2012,2,DATE '2012-03-01',1,7,DATE '2012-05-01','N'),
+	('CMP',3030,'A01',0,2012,2,DATE '2012-03-04',1,17,DATE '2012-05-04','S'),
+	('CMP',3030,'A01',1,2012,2,DATE '2012-03-04',1,18,DATE '2012-05-04','S'),
+	('CMP',3030,'A01',2,2012,2,DATE '2012-03-04',1,19,DATE '2012-05-04','S'),
+	('ADM',1000,'A01',0,2012,2,DATE '2012-06-03',1,20,DATE '2012-05-03','S'),
+	('ADM',1000,'A01',0,2012,2,DATE '2012-03-06',1,21,DATE '2012-05-06','N'),
+	('ADM',1000,'C01',0,2012,2,DATE '2012-06-03',1,22,DATE '2012-05-03','S'),
+	('ADM',1000,'C01',0,2012,2,DATE '2012-03-06',1,23,DATE '2012-05-06','S'),
+	('FIL',3444,'A01',0,2012,2,DATE '2012-03-01',1,24,DATE '2012-05-01','S'),
+	('FIL',3444,'A01',0,2012,2,DATE '2012-03-03',1,25,DATE '2012-05-03','S'),
+	('FIS',2020,'A01',0,2012,2,DATE '2012-10-04',1,26,DATE '2012-05-04','N'),
+	('FIS',2020,'A01',0,2012,2,DATE '2012-03-06',1,27,DATE '2012-05-06','S'),
+	('FIS',2020,'A01',1,2012,2,DATE '2012-03-06',2,28,DATE '2012-05-06','S'),
+	('FIS',2020,'A01',2,2012,2,DATE '2012-03-06',3,29,DATE '2012-05-06','N'),
+	('FIS',2020,'C01',0,2012,2,DATE '2012-03-02',1,30,DATE '2012-05-02','N'),
+	('FIS',2020,'C01',0,2012,2,DATE '2012-03-05',1,31,DATE '2012-05-05','N'),
+	('FIS',2020,'C01',1,2012,2,DATE '2012-03-05',2,15,DATE '2012-05-05','N'),
+	('FIS',2020,'C01',2,2012,2,DATE '2012-03-05',3,16,DATE '2012-05-05','S'),
+	('MAT',1010,'A01',0,2012,2,DATE '2012-03-03',1,10,DATE '2012-05-03','S'),
+	('MAT',1010,'A01',0,2012,2,DATE '2012-03-06',1,11,DATE '2012-05-06','N'),
+	('MAT',1010,'C01',0,2012,2,DATE '2012-03-03',2,12,DATE '2012-05-03','S'),
+	('MAT',1010,'C01',0,2012,2,DATE '2012-03-06',2,13,DATE '2012-05-06','N');
+
+
+--Consultas:
+
+select * from departamento
+
+select * from aluno
+
+select * from curso
+
+select * from disciplina
+
+select * from matricula
+
+select * from frequencia
+
+--1)    Recupere todos os atributos dos professores do departamento Ciência da Computação.
+select * from professor where codigoDepartamento = 'CMP'
+
+select * from professor join departamento on (codigoDepartamento = codigo) where codigoDepartamento = 'CMP'
+
+select pro.* from professor as pro join departamento as dep on(pro.codigoDepartamento = dep.codigo)
+where dep.nome = upper('CIÊNCIA DA COMPUTAÇÃO') -- RENAN
+
+--2)    Recupere o CPF, nome e endereço dos professores do departamento Administração.
+select p.cpf,p.nome,p.logradouro,p.bairro,p.cidade,p.estado from professor p join departamento on (codigoDepartamento = codigo) where codigoDepartamento = 'ADM'
+
+--3)    Recupere as disciplinas dos cursos de Ciência da Computação e Física.
+select d.nome from disciplina d join curso c on (d.codigoCurso = c.codigo) where c.nome = upper('CIÊNCIA DA COMPUTAÇÃO') or c.nome = upper('FISICA')
+
+
+--4)    Recupere os alunos matriculados na disciplina Engenharia de Software do curso Ciência da Computação 
+--no semestre 2012-2. O resultado deve conter: ano, semestre, matrícula do aluno, nome do aluno, código da disciplina,
+--nome da disciplina e o código do curso.
+
+select distinct t.anoSemestre,t.numeroSemestre, a.matricula,a.nome, t.codigoDisciplina, di.nome,di.codigoCurso 
+from aluno a join matricula m on (a.matricula=m.matriculaAluno) join turma t 
+on (t.numero = m.numeroTurma) join disciplina di on (t.codigoDisciplina = di.codigo)
+where di.nome = upper('engenharia de software') and t.anoSemestre = 2012 and t.numeroSemestre = 2
+
+select m.anoSemestre,m.numeroSemestre,a.matricula,a.nome,d.codigo,d.nome,c.codigo from curso c join disciplina d on(c.codigo = d.codigoCurso)
+join matricula m on (m.codigoDisciplina = d.codigo and m.codigoCurso = d.codigoCurso)
+join aluno a on (m.matriculaAluno = a.matricula)
+where d.nome = upper('engenharia de software')
+and c.nome = upper('ciência da computação')
+and m.numeroSemestre = 2 and m.anoSemestre = 2012
+
+
+--5)    Recupere a quantidade de alunos matriculados na disciplina Banco de Dados II do curso Ciência da Computação em 
+--cada semestre letivo.
+
+select m.anoSemestre,m.numeroSemestre,count(*)
+from curso c join disciplina d on (c.codigo = d.codigoCurso) join matricula m on (d.codigoCurso = m.codigoCurso and d.codigo = m.codigoDisciplina)
+where d.nome=upper('Banco de dados ii') group by m.anoSemestre,m.numeroSemestre
+
+
+--6)    Recupere o CPF e nome dos professores que reprovaram mais de 2 alunos em um semestre (reprovação => nota < 7.0).
+--Mostrar também a ano e semestre das reprovações.
+
+select p.cpf, p.nome,d.nome,m.anoSemestre,m.numeroSemestre,count(*)
+from professor p join vinculo v on(p.cpf = v.cpfProfessor) join disciplina d on (d.codigo = v.codigoDisciplina) 
+join matricula m on (d.codigoCurso = m.codigoCurso and d.codigo = m.codigoDisciplina)
+where m.notaFinal < 7
+group by p.cpf, p.nome,d.nome,m.anoSemestre,m.numeroSemestre
+having count(*) > 2
+
+
+--7)    Recupere o código da disciplina, nome da disciplina, código do curso, número de alunos matriculados na disciplina e 
+--a média das notas dos alunos matriculados na disciplina.
+
+select c.codigo,c.nome,d.codigo,d.nome,count(*), avg(notaFinal) as media
+from curso c join disciplina d on (c.codigo = d.codigoCurso) join matricula m on (d.codigoCurso = m.codigoCurso and d.codigo = m.codigoDisciplina)
+ group by c.codigo,c.nome,d.codigo,d.nome
+ order by media
+
+
+--8)    Recupere os professores do curso de Ciência da Computação, em ordem alfabética. A lista deve conter todos 
+--os atributos de Professor e o código do departamento onde ele está vinculado.
+
+select distinct p.* from professor p join vinculo v on(p.cpf = v.cpfProfessor) join curso c on 
+(v.codigoCurso = c.codigo)
+where c.nome = upper('Ciência da Computação')
+order by p.nome
+
+--9)    Recupere os alunos que tiveram faltas. A lista deve conter nome do curso, nome da disciplina, nome do aluno e 
+--número de faltas. Ordenar a relação de forma decrescente, de acordo com número de faltas.
+select c.nome,d.nome,a.nome,f.indPresenca,count(*)
+from aluno a join frequencia f on (a.matricula = matriculaAluno) join disciplina d on (d.codigo = f.codigoDisciplina) join curso c on
+(c.codigo = d.codigoCurso) order by indPresenca desc
