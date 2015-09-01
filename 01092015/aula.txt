@@ -1,0 +1,50 @@
+Especificação de Visões
+
+comando SQL:
+ - um nome para a visão(tabela virtual)
+ - Opcional, uma lista de nomes e atributos(por exemplo, quando operações aritméticas
+ são especificadas ou quando se deseja que os nomes sejam diferentes dos nomes dos atributos
+ da relação base)
+ - uma consulta para especificar o conteúdo dessa visão
+ 
+ exemplo: 
+ CREATE VIEW TRABALHA_EM1(PNOME,UNOME,PJNOME,HORAS) AS 
+ SELECT PNOME,UNOME,PJNOME,HORAS
+ FROM EMPREGADO,PROJETO,TRABALHA_EM
+ WHERE SSN - ESSN AND PNO = PNUMERO
+ ORDER BY PNOME;
+ 
+ 
+ USANDO A TABELA VIRTUAL
+ 
+ SELECT PNOME, UNOME
+ FROM TRABALHA_EM1
+ WHERE PJNOME='ProjetoX'
+ 
+ 
+ eliminando a tabela:
+ DROP VIEW TRABALHA_EM1;
+ 
+ 
+ 
+ Materialização Eficiente de Visões
+ 
+ Envolve a criação física e manutenção de uma tabela temporária, após a primeira consulta
+ 
+ Preocupação:
+   - Manutenção da correspondecia entre as tabelas base e a visão quando as tabelas 
+   são atualizadas
+   
+Estrategia:
+ - atualização incremental
+ 
+ 
+Atualização de Visões
+
+Visão de uma única tabela e sem operações de agragação:
+  - É atualizavel se a visão contiver os atributos da chave primária da tabela base
+Visões envolvendo junções:
+  - Em geral não são atualizaveis
+  
+  
+ 
