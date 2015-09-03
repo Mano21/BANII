@@ -1,0 +1,7 @@
+Especificações de funções
+
+Bando de dados -> possuem estrutura cliente/servidor
+
+Para situações simples ou aplicações pequenas ==> SQL é suficiente.
+    ==> Cliente e servidor na mesma máquina
+    ==> Consultas mais simples 
