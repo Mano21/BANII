@@ -5,3 +5,34 @@ Bando de dados -> possuem estrutura cliente/servidor
 Para situações simples ou aplicações pequenas ==> SQL é suficiente.
     ==> Cliente e servidor na mesma máquina
     ==> Consultas mais simples 
+    ==> Pequena quantidade de dados retornado
+    
+    
+CREATE FUNCTION multiplica(valor_a real,valor_b real) RETURNS real AS
+$$
+BEGIN
+    RETURN valor_a * valor_b;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+//excluindo...
+
+DROP FUNCTION MULTIPLICA(real,real);
+
+
+==> paramentos sem nome
+
+CREATE FUNCTION multiplica(real,real) RETURNS real AS
+$$
+DECLARE
+    valor_a ALIAS FOR $1
+    valor_b ALIAS FOR $2
+
+BEGIN
+    RETURN valor_a * valor_b;
+END;
+$$
+LANGUAGE plpgsql;
+
