@@ -1,0 +1,21 @@
+Eventos => Insert, update,delete..
+        => truncate
+
+
+WHEN => before, after and instead of.
+
+Before statement -> são executadas em ordem alfabética
+  Mecanismo de execução verfica quais linhas serão modiicas pelo comando SQL
+  
+  para cada linha que será modificada(ordem aleátoria)
+    -> gastilhos BEFORE EACH ROW são executadas em ordem alfabética
+    -> comando sql é executado
+  
+  para cada linha que foi modificada
+    ->gatilhos after each row são executados em ordem alfabetica
+    
+  
+  
+  Gatilhos After Statement são excutados em ordem alfabética
+  
+  
