@@ -1,0 +1,47 @@
+- Projeto de banco de dados - Fases do projeto, integração de visões, etc.
+
+- SQL - DDL (Criação de visões ) e DML (SELECT-FROM-WHERE, junções interna (inner joint) e operações de conjuntos)
+
+- Funções e Gatilhos
+
+
+
+Prova: 
+
+Metodologia  para o projeto de BD
+ - consolidação e integração de dados dentro da organização
+ - manutenção de dados complexos
+ - simplicidade no desenvolvimento de novas aplicações 
+ - independencia de dados
+    - protege aplicações de mudanças na organização lógica subjacente, nos caminhos
+    de acesso físico e nas estruturas de armazenamento
+ - esquemas externos(visões)
+    - permite que um mesmo conjunto de dados seja udado em diversas aplicações, cada 
+    uma com sua própria visão dos dados
+  
+
+Sistemas de Informação
+   - Dois ciclos de vida de sistemas:
+    - Macro ciclo de vida: ciclo de vida dos sistemas de informação tradicionais
+    - Micro ciclo de vida: ciclo de vida dos sistemas de Banco de Dados
+    
+
+
+Análise de Viabilidade
+ - Análise das áreas potenciais de aplicação
+ - Identificação da economia relativa ao ganho e a
+disseminação da informação
+ - Realização de estudos de custo-benefício
+ - Determinação das prioridades entre aplicações
+
+Levantamento e Análise de Requisitos
+ - Coleta detalhada de requisitos
+ - Interação com os usuários
+
+Projeto
+ - Projeto do sistema de Banco de Dados
+ - Projeto dos programas que usam e processam o banco de
+dados
+
+
+ 
