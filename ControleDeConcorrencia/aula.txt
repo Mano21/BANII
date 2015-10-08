@@ -1,0 +1,88 @@
+Transações Longas - SAGA
+
+proposta para transações longas: Vários Minutos, várias horas, vários dias.
+
+alternativa para não segurar locksa no banco
+
+Alternativa para ambientes com alta incidência de deadlocks
+  - Deadlocks podem ser reflexo de transações longas
+  
+A consequência de deadlocks são:
+  - Esperas muito longas para usuários/sistemas
+  - Alto índice de transações abortadas
+  - Efeito cascada que só piora com o tempo
+  
+A idéia é aliviar para que a transação precise ser executada de forma atômica sem
+afetar integridade:
+  - Uma transação T pode ser vista como uma coleção de subtransações t1,t2,tn.
+  - No entanto, apenas aplicar o subconjunto de transações em um banco não atende a ideia
+  de T manter os dados consistentes.
+  - É preciso um mecanismo de compensação
+  
+
+
+O conceito de SAGA respeita definições de transação onde:
+ - Ocorrência de tudo ou nada;
+ - Nenhum processo ficará pela metade (manter consistência)
+ - Mas não implementa as propriedades ACID
+
+
+Por definição, SAGA tem 2 propriedades:
+ - Permite apenas 2 níveis de transações. A transação principal e subtrações simples.
+ - A atomicidade no modelo. Outras transações Saga podem sim ver resultados parciais.
+ 
+
+Vantagens: próximo do modelo do mundo real, não gera bloqueios, se encaixa bem com sistema 
+terceiros
+
+Desvantagens: Exige maior esforço de implementação, não prove garantias ACID
+
+
+
+NoSQL:
+
+ - Escala(horizontal na ordem de milhares)
+ - Distribuição(Sharding)
+ - Consistência(Eventualmente consistente)
+ - Schemaless(Modelo de dados flexível)
+ 
+ Utilização via API
+ Utilização distribuída
+  - Índices
+  - Memória
+  - Armazenamento
+  
+Escala: datacenters em diferentes locais, nem tudo precisa de transação, 
+sem custo de licensa por máquina , 1000 servidores e tolerante a falhas.
+
+Distribuição: 
+  Duas formas:Replicação e Sharding
+  
+Consistência:
+ - Replicar demais pode ser caro
+ - Replicar pouco impacta a consistência
+ - Existe um Fator de Replicação
+   - R -> nós participando de uma leitura
+   - W -> nós participando de uma escrita
+   - N - Total de nós no cl
+
+Acid x Base
+
+Basic Availability
+Soft Sate
+Eventual Consistency
+E - Em alguem momento, tudo será consistente.
+
+Schemaless
+ - Alterar atribuitos
+ - Remover atributos
+ - Ter dados com variações no chema
+ 
+
+importancia da latência -> toda a decisão do CAP é iniciada a partir de um 
+eventual timeout entre partições
+
+A latência define o tempo para dectar uma falha para a tomada da decisão sobre A ou C
+
+
+
